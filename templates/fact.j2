@@ -1,0 +1,4 @@
+[{{ bacula_director_database_type }}]
+{% for item in bacula_director_database_inited.results %}
+{{ item.item }}={{ item.rc }}
+{% endfor %}

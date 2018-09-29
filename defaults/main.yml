@@ -1,0 +1,98 @@
+---
+bacula_director_version: 5.2.13
+
+bacula_director_console_password: "@@DIR_PASSWORD@@"
+bacula_director_name: bacula-dir
+bacula_director_port: 9101
+bacula_director_query_file: /etc/bacula/query.sql
+bacula_director_working_directory: /var/spool/bacula
+bacula_director_pid_directory: /var/run
+bacula_director_maximum_concurrent_jobs: 1
+
+bacula_director_database_type: sqlite3
+# bacula_director_database_type: postgresql
+# bacula_director_database_type: mysql
+
+bacula_director_catalog:
+  name: MyCatalog
+  dbname: bacula
+  dbuser: bacula
+  dbpassword: ""
+
+bacula_director_storages: []
+# - name: FileServerStorage
+#   address: storage_server_address
+#   port: 9103
+#   password: "storage_server_password"
+#   device: FileServerDevice
+#   media_type: File
+
+bacula_director_file_sets: []
+# - name: etc
+#   includes:
+#     - options:
+#         signature: MD5
+#       files:
+#         - /etc
+
+bacula_director_pools: []
+# - name: File
+#   comment: File Pool definition
+#   pool_type: Backup
+#   recycle: "yes"
+#   auto_prune: "yes"
+#   volume_retention: 365 days
+#   maximum_volume_bytes: 50G
+#   maximum_volumes: 100
+#   label_format: "file-"
+
+bacula_director_job_defs: []
+# - name: EtcJobDefs
+#   type: Backup
+#   file_set: etc
+#   pool: File
+#   storage: FileServerStorage
+#   messages: Standard
+
+bacula_director_jobs: []
+# - name: EtcFullDailyOnClientJob
+#   job_defs: EtcJobDefs
+#   client: FirstClient
+#   level: Full
+#   schedule: DailyCycle
+#
+# - name: EtcDifferentialEveryThirtyMinutesOnClientJob
+#   job_defs: EtcJobDefs
+#   client: FirstClient
+#   level: Differential
+#   schedule: ThirtyMinutesCycle
+#
+# - name: EtcIncrementalEveryTenMinutesOnClientJob
+#   job_defs: EtcJobDefs
+#   client: FirstClient
+#   level: Incremental
+#   schedule: TenMinutesCycle
+
+bacula_director_schedules: []
+# - name: DailyCycle
+#   run:
+#     - "daily at 3:17"
+# - name: ThirtyMinutesCycle
+#   run:
+#     - "hourly at 0:04"
+#     - "hourly at 0:34"
+# - name: TenMinutesCycle
+#   run:
+#     - "hourly at 0:09"
+#     - "hourly at 0:19"
+#     - "hourly at 0:29"
+#     - "hourly at 0:39"
+#     - "hourly at 0:49"
+#     - "hourly at 0:59"
+
+bacula_director_clients: []
+# - name: FirstClient
+#   address: first_client_address
+#   port: 9102
+#   password: first_client_password
+#   catalog: MyCatalog

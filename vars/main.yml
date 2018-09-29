@@ -1,0 +1,84 @@
+---
+bacula_director_facts_database: "bacula_{{ bacula_director_database_type }}"
+
+bacula_director_database_user:
+  postgresql: postgres
+  sqlite3: root
+
+bacula_director_catalog_params:
+  name:
+    name: Name
+  dbaddress:
+    name: dbaddress
+  dbport:
+    name: dbport
+  dbname:
+    name: dbname
+  dbuser:
+    name: dbuser
+  dbpassword:
+    name: dbpassword
+
+bacula_director_storage_params:
+  name:
+    name: Name
+  address:
+    name: Address
+  port:
+    name: SDPort
+  password:
+    name: Password
+  device:
+    name: Device
+  media_type:
+    name: Media Type
+
+bacula_director_job_params:
+  name:
+    name: Name
+  type:
+    name: Type
+  job_defs:
+    name: JobDefs
+  client:
+    name: Client
+  storage:
+    name: Storage
+  pool:
+    name: Pool
+  level:
+    name: Level
+  file_set:
+    name: FileSet
+  schedule:
+    name: Schedule
+  run_before_job:
+    name: RunBeforeJob
+  run_after_job:
+    name: RunAfterJob
+  where:
+    name: Where
+  write_bootstrap:
+    name: Write Bootstrap
+  priority:
+    name: Priority
+  messages:
+    name: Messages
+
+bacula_director_pool_params:
+  name:
+    name: Name
+  pool_type:
+    name: Pool Type
+  recycle:
+    name: Recycle
+  auto_prune:
+    name: AutoPrune
+  volume_retention:
+    name: Volume Retention
+  maximum_volume_bytes:
+    name: Maximum Volume Bytes
+  maximum_volumes:
+    name: Maximum Volumes
+  label_format:
+    name: Label Format

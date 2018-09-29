@@ -1,0 +1,200 @@
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# !! This file managed by ansible !!
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+{# --- Begin Director --- #}
+Director {
+  Name = "{{ bacula_director_name }}"
+  DIRport = {{ bacula_director_port }}
+  QueryFile = "{{ bacula_director_query_file }}"
+  WorkingDirectory = "{{ bacula_director_working_directory }}"
+  PidDirectory = "{{ bacula_director_pid_directory }}"
+  Maximum Concurrent Jobs = {{ bacula_director_maximum_concurrent_jobs }}
+  Password = "{{ bacula_director_console_password }}"
+  Messages = Daemon
+}
+{# ---- End Director ---- #}
+
+{# --- Begin JobDefs --- #}
+{% for job_defs in bacula_director_job_defs %}
+{% if job_defs.comment is defined %}
+# {{ job_defs.comment }}
+{% endif %}
+JobDefs {
+{% for param, value in job_defs.iteritems() %}
+{% if param in bacula_director_job_params %}
+  {{ bacula_director_job_params[param].name }} = "{{ value }}"
+{% endif %}
+{% endfor %}
+}
+{% endfor %}
+{# ---- End JobDefs ---- #}
+
+{# --- Begin Job --- #}
+{% for job in bacula_director_jobs %}
+{% if job.comment is defined %}
+# {{ job.comment }}
+{% endif %}
+Job {
+{% for param, value in job.iteritems() %}
+{% if param in bacula_director_job_params %}
+  {{ bacula_director_job_params[param].name }} = "{{ value }}"
+{% endif %}
+{% endfor %}
+}
+{% endfor %}
+{# ---- End Job ---- #}
+
+{# --- Begin FileSet --- #}
+{% for file_set in bacula_director_file_sets %}
+FileSet {
+  Name = "{{ file_set.name }}"
+{% for include in file_set.includes %}
+  Include {
+{% if include.options is defined %}
+    Options {
+{% for option, value in include.options.iteritems() %}
+      {{ option }} = "{{ value }}"
+{% endfor %}
+    }
+{% endif %}
+{% for file in include.files %}
+    File = "{{ file }}"
+{% endfor %}
+  }
+{% endfor %} {# endfor include in file_set #}
+{% if file_set.exclude is defined %}
+{% for exclude in file_set.excludes %}
+    File = "{{ file }}"
+{% endfor %}
+{% endif %}
+}
+{% endfor %} {# endfor file_set in bacula_director_file_sets #}
+{# ---- End FileSet ---- #}
+
+{# --- Begin Schedule --- #}
+{% for schedule in bacula_director_schedules %}
+Schedule {
+  Name = "{{ schedule.name }}"
+{% for run in schedule.run %}
+  Run = {{ run }}
+{% endfor %}
+}
+
+{% endfor %}
+{# ---- End Schedule ---- #}
+
+
+{# --- Begin Client --- #}
+{% for client in bacula_director_clients %}
+{% if client.comment is defined %}
+# {{ client.comment }}
+{% endif %}
+Client {
+  Name = "{{ client.name }}"
+  Address = "{{ client.address }}"
+{% if client.port is defined %}
+  FDPort = 9102
+{% endif %}
+  Catalog = "{{ client.catalog }}"
+  Password = "{{ client.password }}"
+{% if client.file_retention is defined %}
+  File Retention = "{{ client.file_retention }}"
+{% endif %}
+{% if client.job_retention is defined %}
+  Job Retention = "{{ client.job_retention }}"
+{% endif %}
+{% if client.auto_prune is defined %}
+  AutoPrune = "{{ client.auto_prune }}"
+{% endif %}
+}
+{% endfor %}
+{# ---- End Client ---- #}
+
+
+{# --- Begin Storage --- #}
+{% for storage in bacula_director_storages %}
+{% if storage.comment is defined %}
+# {{ storage.comment }}
+{% endif %}
+Storage {
+{% for param, value in storage.iteritems() %}
+{% if param in bacula_director_storage_params %}
+  {{ bacula_director_storage_params[param].name }} = "{{ value }}"
+{% endif %}
+{% endfor %}
+}
+
+{% endfor %}
+{# ---- End Storage ---- #}
+
+
+{# --- Begin Pool --- #}
+{% for pool in bacula_director_pools %}
+{% if pool.comment is defined %}
+# {{ pool.comment }}
+{% endif %}
+Pool {
+{% for param, value in pool.iteritems() %}
+{% if param in bacula_director_pool_params %}
+  {{ bacula_director_pool_params[param].name }} = {{ value }}
+{% endif %}
+{% endfor %}
+}
+
+{% endfor %}
+{# ---- End Pool ---- #}
+
+
+{# --- Begin Catalog --- #}
+Catalog {
+{% for param, value in bacula_director_catalog.iteritems() %}
+{% if param in bacula_director_catalog_params %}
+  {{ bacula_director_catalog_params[param].name }} = "{{ value }}"
+{% endif %}
+{% endfor %}
+}
+{# ---- End Catalog ---- #}
+
+
+
+# Reasonable message delivery -- send most everything to email address
+#  and to the console
+Messages {
+  Name = Standard
+#
+# NOTE! If you send to two email or more email addresses, you will need
+#  to replace the %r in the from field (-f part) with a single valid
+#  email address in both the mailcommand and the operatorcommand.
+#  What this does is, it sets the email address that emails would display
+#  in the FROM field, which is by default the same email as they're being
+#  sent to.  However, if you send email to more than one address, then
+#  you'll have to set the FROM address manually, to a single address.
+#  for example, a 'no-reply@mydomain.com', is better since that tends to
+#  tell (most) people that its coming from an automated source.
+
+#
+  mailcommand = "/usr/sbin/bsmtp -h localhost -f \"\(Bacula\) \<%r\>\" -s \"Bacula: %t %e of %c %l\" %r"
+  operatorcommand = "/usr/sbin/bsmtp -h localhost -f \"\(Bacula\) \<%r\>\" -s \"Bacula: Intervention needed for %j\" %r"
+  mail = root@localhost = all, !skipped
+  operator = root@localhost = mount
+  console = all, !skipped, !saved
+#
+# WARNING! the following will create a file that you must cycle from
+#          time to time as it will grow indefinitely. However, it will
+#          also keep all your messages if they scroll off the console.
+#
+  append = "/var/log/bacula/bacula.log" = all, !skipped
+  catalog = all
+}
+
+
+#
+# Message delivery for daemon messages (no job).
+Messages {
+  Name = Daemon
+  mailcommand = "/usr/sbin/bsmtp -h localhost -f \"\(Bacula\) \<%r\>\" -s \"Bacula daemon message\" %r"
+  mail = root@localhost = all, !skipped
+  console = all, !skipped, !saved
+  append = "/var/log/bacula/bacula.log" = all, !skipped
+}

@@ -1,0 +1,34 @@
+---
+- name: Install Bacula Director
+  yum:
+    name: "bacula-director-{{ bacula_director_version }}"
+
+- name: "Select database: {{ bacula_director_database_type}}"
+  alternatives:
+    name: libbaccats.so
+    path: "/usr/lib64/libbaccats-{{ bacula_director_database_type }}.so"
+
+- name: Configure database
+  become_user: "{{ bacula_director_database_user[bacula_director_database_type] }}"
+  shell: "/usr/libexec/bacula/{{ item }}"
+  loop:
+    - "create_{{ bacula_director_database_type }}_database"
+    - "make_{{ bacula_director_database_type }}_tables"
+    - "grant_{{ bacula_director_database_type }}_privileges"
+  register: bacula_director_database_inited
+  when: (bacula_director_facts_database not in ansible_local) or
+        (bacula_director_database_type not in ansible_local[bacula_director_facts_database]) or
+        (item not in ansible_local[bacula_director_facts_database][bacula_director_database_type]) or
+        (ansible_local[bacula_director_facts_database][bacula_director_database_type][item] != "0")
+
+- name: Create directory for ansible custom facts
+  file:
+    dest: /etc/ansible/facts.d
+    recurse: true
+    state: directory
+
+- name: Save facts about config database
+  template:
+    src: fact.j2
+    dest: "/etc/ansible/facts.d/{{ bacula_director_facts_database }}.fact"
+  when: bacula_director_database_inited.changed

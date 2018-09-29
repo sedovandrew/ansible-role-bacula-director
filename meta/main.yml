@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  role_name: bacula_director
+  author: Sedov Andrey
+  description: Installation and configuration of the Bacula Director.
+  issue_tracker_url: https://github.com/sedovandrew/ansible-role-bacula-director/issues
+  license: BSD
+  min_ansible_version: 2.4
+
+  platforms:
+    - name: EL
+      versions:
+        - 7
+
+  galaxy_tags:
+    - bacula
+
+dependencies: []

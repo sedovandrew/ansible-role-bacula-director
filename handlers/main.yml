@@ -1,0 +1,6 @@
+---
+- name: restart bacula-director
+  systemd:
+    name: bacula-dir
+    enabled: true
+    state: restarted
