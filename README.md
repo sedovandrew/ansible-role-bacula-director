@@ -1,6 +1,8 @@
 Role bacula_director
 ====================
 
+[![Build Status](https://travis-ci.org/sedovandrew/ansible-role-bacula-director.svg?branch=master)](https://travis-ci.org/sedovandrew/ansible-role-bacula-director)
+
 Installation and configuration of the Bacula Director.
 
 Role Variables
